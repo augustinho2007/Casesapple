@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consulta de Reparo Apple</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #f5f5f7;
+      color: #1d1d1f;
+    }
+    .card {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 24px;
+    }
+    p {
+      line-height: 1.5;
+    }
+    .grid {
+      display: grid;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #0071e3;
+      color: white;
+    }
+    button.secondary {
+      background: #e5e5ea;
+      color: #1d1d1f;
+    }
+    .url-box {
+      margin-top: 20px;
+      padding: 12px;
+      background: #f2f2f2;
+      border-radius: 10px;
+      word-break: break-all;
+      font-size: 14px;
+    }
+    .note {
+      margin-top: 16px;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Consulta de Reparo Apple</h1>
+    <p>Preencha o número do reparo e o serial. O HTML monta a URL automaticamente e abre a página.</p>
+
+    <div class="grid">
+      <div>
+        <label for="repair">Número do reparo</label>
+        <input id="repair" type="text" placeholder="Ex.: D707534891" />
+      </div>
+
+      <div>
+        <label for="serial">Serial</label>
+        <input id="serial" type="text" placeholder="Ex.: H6X2N5XMHG" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button onclick="abrirLink()">Abrir consulta</button>
+      <button class="secondary" onclick="copiarLink()">Copiar URL</button>
+    </div>
+
+    <div class="url-box" id="urlFinal">A URL gerada vai aparecer aqui.</div>
+    <div class="note">Obs.: o site da Apple pode bloquear carregamento dentro de iframe. Nesse caso, o botão abre em nova aba normalmente.</div>
+  </div>
+
+  <script>
+    function limparTexto(valor) {
+      return String(valor || '')
+        .replace(/[“”"']/g, '')
+        .trim();
+    }
+
+    function gerarURL() {
+      const repair = encodeURIComponent(limparTexto(document.getElementById('repair').value));
+      const serial = encodeURIComponent(limparTexto(document.getElementById('serial').value));
+
+      if (!repair || !serial) {
+        document.getElementById('urlFinal').textContent = 'Preencha o número do reparo e o serial.';
+        return null;
+      }
+
+      const url = `https://mysupport.apple.com/repairs/details/${repair}?serialNumber=${serial}&cid=acs::repair.email`;
+      document.getElementById('urlFinal').textContent = url;
+      return url;
+    }
+
+    function abrirLink() {
+      const url = gerarURL();
+      if (url) {
+        window.open(url, '_blank');
+      }
+    }
+
+    async function copiarLink() {
+      const url = gerarURL();
+      if (!url) return;
+
+      try {
+        await navigator.clipboard.writeText(url);
+        alert('URL copiada!');
+      } catch (e) {
+        alert('Não consegui copiar automaticamente. Mas a URL já está mostrada na tela.');
+      }
+    }
+
+    document.getElementById('repair').addEventListener('input', gerarURL);
+    document.getElementById('serial').addEventListener('input', gerarURL);
+  </script>
+</body>
+</html>
